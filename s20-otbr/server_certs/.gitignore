@@ -1,0 +1,5 @@
+# Generated key material — never commit private keys or CSRs.
+ca_cert.pem
+ca_key.pem
+ca_csr.pem
+*.srl

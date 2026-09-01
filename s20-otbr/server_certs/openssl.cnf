@@ -1,0 +1,30 @@
+# OpenSSL configuration for ep-s20-otbr OTA trust-anchor (self-signed CA).
+# Override distinguished-name fields via environment variables in the scripts:
+#   CERT_C, CERT_ST, CERT_O, CERT_CN
+
+[ req ]
+default_bits       = 2048
+prompt             = no
+default_md         = sha256
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+x509_extensions    = v3_ca
+
+[ req_distinguished_name ]
+C  = AU
+ST = Some-State
+O  = ep-s20-otbr OTA
+CN = ep-s20-otbr-ca
+
+# CSR extensions — no authorityKeyIdentifier (no issuer exists yet).
+[ req_ext ]
+basicConstraints = critical, CA:TRUE
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+
+# Issued certificate extensions — applied when signing the CSR.
+[ v3_ca ]
+basicConstraints = critical, CA:TRUE
+keyUsage = critical, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer

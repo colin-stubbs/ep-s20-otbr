@@ -50,6 +50,13 @@ To flash the firmware with a USB cable:
 ```
 $ idf.py -p /dev/ttyUSB0 flash
 ```
+
+Though you will most likely need to erase NVS contents at the same time. If you see constant reboots while monitoring the device do this.
+```
+$ cd s20-otbr
+$ idf.py -p /dev/tty.usbserial-1430 erase-flash
+$ idf.py -p /dev/tty.usbserial-1430 flash monitor
+```
 To start monitor with a USB cable:
 ```
 $ idf.py -p /dev/ttyUSB0 monitor
@@ -62,6 +69,35 @@ $ ./script/push-update.sh <IP-ADDRESS>
 ```
 
 More [flashing procedures](docs/flash.md).
+
+## OTA CA certificate
+
+HTTPS OTA updates trust the self-signed CA embedded at `s20-otbr/server_certs/ca_cert.pem`.
+Regenerate the key, CSR, and certificate with:
+
+```
+make ca-clean ca-all
+```
+
+This writes artifacts under `s20-otbr/server_certs/`:
+
+- `ca_cert.pem` — embedded in firmware (committed)
+- `ca_key.pem` — private key (gitignored; keep secure)
+- `ca_csr.pem` — signing request (gitignored)
+- `openssl.cnf` — OpenSSL configuration
+
+Override subject fields or validity, for example:
+
+```
+make ca-clean ca-all CERT_CN=ota.example.com CERT_DAYS=825
+```
+
+Use the same `ca_key.pem` and `ca_cert.pem` when hosting an HTTPS OTA server, e.g.:
+
+```
+openssl s_server -WWW -key s20-otbr/server_certs/ca_key.pem \
+  -cert s20-otbr/server_certs/ca_cert.pem -port 8070
+```
 
 ## Work with Home Assistant
 
